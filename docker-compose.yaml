@@ -1,6 +1,17 @@
 version: "3.9"
 
 services:
+  postgres:
+    container_name: postgres
+    image: postgres:14.1-alpine
+    restart: always
+    env_file:
+      # BE SURE TO CHANGE THIS LINE BEFORE GOING TO PRODUCTION
+      - ./postgres.env
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgres-lib:/var/lib/postgresql/data
   influxdb:
     container_name: influxdb
     image: influxdb:2.4.0-alpine
@@ -34,6 +45,9 @@ services:
     privileged: true
 
 volumes:
+  postgres-lib:
+    external: false
+
   influxdb-lib:
     external: false
 

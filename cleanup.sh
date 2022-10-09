@@ -5,8 +5,8 @@ set -o pipefail
 echo "[info] checking container(s) running state"
 echo
 
-if docker compose ls | grep "running" >/dev/null; then
-  docker compose ls
+if podman-compose ps | grep "running" >/dev/null; then
+  podman-compose ps
 else
   echo "* skipped, no container running"
   exit 0
@@ -14,7 +14,7 @@ fi
 
 echo
 echo "VOLUMES"
-TARGET_VOLUMES=$(docker volume list -f dangling=false | grep "$(awk -F'=' /COMPOSE_PROJECT_NAME/'{print$2}' .env)" | awk '{print$2}')
+TARGET_VOLUMES=$(podman volume list -f dangling=false | grep "$(awk -F'=' /COMPOSE_PROJECT_NAME/'{print$2}' .env)" | awk '{print$2}')
 for v in ${TARGET_VOLUMES[@]}; do echo ${v}; done
 
 echo
@@ -29,14 +29,14 @@ if [ "${YES_OR_NO}" = "yes" ]; then
   if [ "${INCLUDE_VOLUMES}" = "yes" ]; then
     echo "[info] shutting down containers defined in docker-compose.yaml (including volumes)"
     echo
-    docker compose down
+    podman-compose down
 
     echo "[info] removing volumes"
-    for v in ${TARGET_VOLUMES[@]}; do docker volume rm ${v}; done
+    for v in ${TARGET_VOLUMES[@]}; do podman volume rm ${v}; done
   else
     echo "[info] shutting down containers defined in docker-compose.yaml (volumes excluded)"
     echo
-    docker compose down
+    podman-compose down
   fi
 else
   echo "* skipped, nothing happen"
